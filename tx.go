@@ -1,4 +1,4 @@
-package webo
+package sqlo
 
 import (
 	"context"
