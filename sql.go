@@ -10,6 +10,20 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type Selecter interface {
+	Select(interface{}, string, ...interface{}) error
+	Get(interface{}, string, ...interface{}) error
+}
+
+type Execer interface {
+	Selecter
+	Exec(string, ...interface{}) (sql.Result, error)
+	MustExec(string, ...interface{}) sql.Result
+	NamedExec(string, interface{}) (sql.Result, error)
+	InsertMap(string, map[string]interface{}) (sql.Result, error)
+	UpdateMap(string, map[string]interface{}, string, ...interface{}) (sql.Result, error)
+}
+
 type Sx struct {
 	Sx         sqlx.Ext
 	ParamStyle int
@@ -22,27 +36,38 @@ func New(tx sqlx.Ext) *Sx {
 	return t
 }
 
-func (x *Sx) Log(query string, args ...interface{}) {
+func (x *Sx) log(query string, args ...interface{}) {
 	if x.Logger == nil {
 		return
 	}
 	x.Logger.Println(sql_fake(x.DbType, query, args...))
 }
+
 func (x *Sx) Select(dest interface{}, query string, args ...interface{}) error {
-	x.Log(query, args...)
+	x.log(query, args...)
 	return sqlx.Select(x.Sx, dest, query, args...)
 }
+
 func (x *Sx) Get(dest interface{}, query string, args ...interface{}) error {
-	x.Log(query, args...)
+	x.log(query, args...)
 	return sqlx.Get(x.Sx, dest, query, args...)
 }
+
+func (x *Sx) MustExec(query string, args ...interface{}) sql.Result {
+	res, err := x.Exec(query, args...)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
 func (x *Sx) Exec(query string, args ...interface{}) (sql.Result, error) {
-	x.Log(query, args...)
+	x.log(query, args...)
 	return x.Sx.Exec(query, args...)
 }
 
 func (x *Sx) NamedExec(query string, arg interface{}) (sql.Result, error) {
-	x.Log(query, arg)
+	x.log(query, arg)
 	return sqlx.NamedExec(x.Sx, query, arg)
 }
 
