@@ -25,10 +25,9 @@ type Execer interface {
 }
 
 type Sx struct {
-	Sx         sqlx.Ext
-	ParamStyle int
-	Logger     *log.Logger
-	DbType     int
+	Sx     sqlx.Ext
+	Logger *log.Logger
+	DbType int
 }
 
 func New(tx sqlx.Ext) *Sx {
@@ -107,7 +106,10 @@ func (x *Sx) InsertMap(table string, m map[string]interface{}) (sql.Result, erro
 func (x *Sx) updateSt(table string, m map[string]interface{}, where string, where_vals ...interface{}) (string, []interface{}) {
 	sets := make([]string, 0)
 	num := len(where_vals) + 1
-	values := where_vals[:]
+	values := []interface{}{}
+	if x.DbType != DB_ACCESS { // si type $1 $2... on met les vals en premier sinon en dernier
+		values = where_vals[:]
+	}
 
 	fieldnames := make([]string, 0)
 	for name, _ := range m {
@@ -116,7 +118,7 @@ func (x *Sx) updateSt(table string, m map[string]interface{}, where string, wher
 	sort.Strings(fieldnames)
 	for _, name := range fieldnames {
 		if x.DbType == DB_ACCESS {
-			sets = append(sets, "?")
+			sets = append(sets, fmt.Sprintf("%s=?", name))
 		} else {
 			sets = append(sets, fmt.Sprintf("%s=$%d", name, num))
 		}
@@ -127,6 +129,10 @@ func (x *Sx) updateSt(table string, m map[string]interface{}, where string, wher
 		table,
 		strings.Join(sets, ", "),
 		where)
+
+	if x.DbType == DB_ACCESS {
+		values = append(values, where_vals...)
+	}
 	return s, values
 }
 func (x *Sx) UpdateMap(table string, m map[string]interface{}, where string, where_vals ...interface{}) (sql.Result, error) {

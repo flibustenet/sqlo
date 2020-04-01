@@ -26,3 +26,28 @@ func Test_updateSt(t *testing.T) {
 		log.Fatal(q)
 	}
 }
+
+func Test_insertStAccess(t *testing.T) {
+	tx := &Sx{}
+	tx.DbType = DB_ACCESS
+
+	fs := map[string]interface{}{}
+	fs["ok"] = "coral"
+	fs["yes"] = "no"
+	q, _ := tx.insertSt("mytable", fs)
+	if q != "INSERT INTO mytable (ok, yes) VALUES (?, ?)" {
+		log.Fatalf("insert access : %s", q)
+	}
+}
+
+func Test_updateStAccess(t *testing.T) {
+	tx := &Sx{}
+	tx.DbType = DB_ACCESS
+	fs := map[string]interface{}{}
+	fs["ok"] = "coral"
+	fs["yes"] = "no"
+	q, _ := tx.updateSt("mytable", fs, "ok=?", "ok")
+	if q != "UPDATE mytable SET ok=?, yes=? WHERE ok=?" {
+		log.Fatalf("update access : %s", q)
+	}
+}

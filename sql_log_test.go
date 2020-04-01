@@ -39,6 +39,7 @@ func Test_sql_quote_query(t *testing.T) {
 	}
 	tbl := []Tst{
 		Tst{DB_ACCESS, "? ? ? ? ? ?", []interface{}{5, "abcd", "e'fg", true, false, nil}, "5 'abcd' 'e''fg' -1 0 null"},
+		Tst{DB_ACCESS, "update xyz set a=?, b=? where c=?", []interface{}{5, "abcd", "e'fg"}, "update xyz set a=5, b='abcd' where c='e''fg'"},
 		Tst{DB_PG, "$1, $2, $3 $4 $5 $6", []interface{}{5, "abcd", "e'fg", true, false, nil}, "5, 'abcd', 'e''fg' true false null"},
 		Tst{DB_PG, "$1 $3 $2 $3", []interface{}{5, "abcd", "e'fg"}, "5 'e''fg' 'abcd' 'e''fg'"},
 	}

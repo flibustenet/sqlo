@@ -1,0 +1,5 @@
+sqlserver :
+
+utiliser driver name sqlserver au lieu de mssql
+utiliser @p1 @p2 @p3... au lieu de ? ? ? ou $1 $2 $3 (qui marchent avec mssql mais non recommandé
+adapter sql.go et sql_log.go (pas encore utilisé sur la paye)

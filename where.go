@@ -6,7 +6,7 @@ import (
 )
 
 type Where struct {
-	Style string // $ ou ?
+	Style string // $1 $2 (pg) ou ? ? (access) ou TODO @p1 @p2 (sqlserver)
 	where []string
 	Args  []interface{}
 }
