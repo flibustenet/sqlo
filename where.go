@@ -41,11 +41,11 @@ func (w *Where) Appendf(s string, a ...interface{}) {
 func (w *Where) AppendListf(s string, a ...interface{}) {
 	q := []string{} // les $1 $2...
 	for i := 0; i < len(a); i++ {
+		w.Args = append(w.Args, a[i])
 		if w.Style == "?" {
 			q = append(q, "?")
 			continue
 		}
-		w.Args = append(w.Args, a[i])
 		q = append(q, fmt.Sprintf("$%d", len(w.Args)))
 	}
 	w.where = append(w.where, fmt.Sprintf(s, strings.Join(q, ",")))
