@@ -1,6 +1,7 @@
 package sqlo
 
 import (
+	"database/sql"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -64,13 +65,11 @@ func sql_quoter(db_type int, s interface{}) string {
 			return v.Time.Format("'2006-01-02 15:04:05'")
 		}
 		return "null"
-		/*
-			case sql.NullTime:
-				if v.Valid {
-					return v.Time.Format("'2006-01-02 15:04:05'")
-				}
-				return "null"
-		*/
+	case sql.NullTime:
+		if v.Valid {
+			return v.Time.Format("'2006-01-02 15:04:05'")
+		}
+		return "null"
 	case *time.Time:
 		return v.Format("'2006-01-02 15:04:05'")
 	case bool:

@@ -1,9 +1,12 @@
 package sqlo
 
 import (
+	"database/sql"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 func Test_sql_quote(t *testing.T) {
@@ -20,6 +23,8 @@ func Test_sql_quote(t *testing.T) {
 		Tst{DB_ACCESS, true, "-1"},
 		Tst{DB_ACCESS, false, "0"},
 		Tst{DB_ACCESS, nil, "null"},
+		Tst{DB_PG, pq.NullTime{}, "null"},
+		Tst{DB_PG, sql.NullTime{}, "null"},
 		Tst{DB_ACCESS, time.Date(1969, 11, 05, 23, 05, 03, 0, time.Local), "'1969-11-05 23:05:03'"},
 		Tst{DB_PG, time.Date(1969, 11, 05, 23, 05, 03, 0, time.Local), "'1969-11-05 23:05:03'"},
 		Tst{DB_MSSQL, time.Date(1969, 11, 05, 23, 05, 03, 0, time.Local), "'1969-11-05 23:05:03'"},
@@ -45,6 +50,12 @@ func Test_sql_quote_query(t *testing.T) {
 		Tst{DB_PG, "$1 $3 $2 $3", []interface{}{5, "abcd", "e'fg"}, "5 'e''fg' 'abcd' 'e''fg'"},
 		Tst{DB_MSSQL, "@p1, @p2, @p3 @p4 @p5 @p6", []interface{}{5, "abcd", "e'fg", true, false, nil}, "5, 'abcd', 'e''fg' true false null"},
 		Tst{DB_MSSQL, "@p1 @p3 @p2 @p3", []interface{}{5, "abcd", "e'fg"}, "5 'e''fg' 'abcd' 'e''fg'"},
+		Tst{DB_MSSQL, "@p1 @p2 @p3 @p4", []interface{}{
+			pq.NullTime{},
+			pq.NullTime{Valid: true, Time: time.Date(2019, 1, 2, 0, 0, 0, 0, time.Local)},
+			sql.NullTime{},
+			sql.NullTime{Valid: true, Time: time.Date(2019, 1, 2, 0, 0, 0, 0, time.Local)},
+		}, "null '2019-01-02 00:00:00' null '2019-01-02 00:00:00'"},
 	}
 	for _, s := range tbl {
 		r := sql_fake(s.T, s.Q, s.V...)
