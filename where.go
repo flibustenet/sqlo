@@ -6,7 +6,7 @@ import (
 )
 
 type Where struct {
-	Style string // $1 $2 (pg) ou ? ? (access) ou TODO @p1 @p2 (sqlserver)
+	Style string // $ ? @p
 	where []string
 	Args  []interface{}
 }
@@ -21,6 +21,8 @@ func (w *Where) Appendf(s string, a ...interface{}) {
 			switch w.Style {
 			case "?":
 				arg_nb = append(arg_nb, "?")
+			case "@p":
+				arg_nb = append(arg_nb, fmt.Sprintf("@p%d", len(w.Args)+1+i))
 			case "", "$":
 				arg_nb = append(arg_nb, fmt.Sprintf("$%d", len(w.Args)+1+i))
 			}
@@ -42,11 +44,14 @@ func (w *Where) AppendListf(s string, a ...interface{}) {
 	q := []string{} // les $1 $2...
 	for i := 0; i < len(a); i++ {
 		w.Args = append(w.Args, a[i])
-		if w.Style == "?" {
+		switch w.Style {
+		case "?":
 			q = append(q, "?")
-			continue
+		case "@p":
+			q = append(q, fmt.Sprintf("@p%d", len(w.Args)))
+		case "", "$":
+			q = append(q, fmt.Sprintf("$%d", len(w.Args)))
 		}
-		q = append(q, fmt.Sprintf("$%d", len(w.Args)))
 	}
 	w.where = append(w.where, fmt.Sprintf(s, strings.Join(q, ",")))
 }

@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 var DB_PG = 0
@@ -14,6 +16,7 @@ var DB_MSSQL = 2
 
 var sql_log_re_question = regexp.MustCompile(`\?`)
 var sql_log_re_dollar = regexp.MustCompile(`\$\d+`)
+var sql_log_re_sqlserver = regexp.MustCompile(`\@p\d+`)
 
 func sql_fake(db_type int, query string, args ...interface{}) string {
 	if len(args) == 0 {
@@ -22,11 +25,15 @@ func sql_fake(db_type int, query string, args ...interface{}) string {
 	rqi := 0
 
 	frq := func(s string) string {
-		if s == "?" {
+		switch db_type {
+		case DB_ACCESS:
 			rqi++
 			return sql_quoter(db_type, args[rqi-1])
+		case DB_MSSQL:
+			rqi, _ = strconv.Atoi(s[2:len(s)])
+		default: // PG
+			rqi, _ = strconv.Atoi(s[1:len(s)])
 		}
-		rqi, _ = strconv.Atoi(s[1:len(s)])
 		return sql_quoter(db_type, args[rqi-1])
 	}
 	switch db_type {
@@ -34,6 +41,8 @@ func sql_fake(db_type int, query string, args ...interface{}) string {
 		return sql_log_re_question.ReplaceAllStringFunc(query, frq)
 	case DB_PG:
 		return sql_log_re_dollar.ReplaceAllStringFunc(query, frq)
+	case DB_MSSQL:
+		return sql_log_re_sqlserver.ReplaceAllStringFunc(query, frq)
 	}
 	return query
 }
@@ -50,6 +59,18 @@ func sql_quoter(db_type int, s interface{}) string {
 		return "'" + strings.Replace(v, "'", "''", -1) + "'"
 	case time.Time:
 		return v.Format("'2006-01-02 15:04:05'")
+	case pq.NullTime:
+		if v.Valid {
+			return v.Time.Format("'2006-01-02 15:04:05'")
+		}
+		return "null"
+		/*
+			case sql.NullTime:
+				if v.Valid {
+					return v.Time.Format("'2006-01-02 15:04:05'")
+				}
+				return "null"
+		*/
 	case *time.Time:
 		return v.Format("'2006-01-02 15:04:05'")
 	case bool:

@@ -82,9 +82,12 @@ func (x *Sx) insertSt(table string, m map[string]interface{}) (string, []interfa
 	sort.Strings(fieldnames)
 
 	for i, name := range fieldnames {
-		if x.DbType == DB_ACCESS {
+		switch x.DbType {
+		case DB_ACCESS:
 			fieldols = append(fieldols, "?")
-		} else {
+		case DB_MSSQL:
+			fieldols = append(fieldols, fmt.Sprintf("@p%d", i+1))
+		default: //pg
 			fieldols = append(fieldols, fmt.Sprintf("$%d", i+1))
 		}
 		values = append(values, m[name])
@@ -117,9 +120,12 @@ func (x *Sx) updateSt(table string, m map[string]interface{}, where string, wher
 	}
 	sort.Strings(fieldnames)
 	for _, name := range fieldnames {
-		if x.DbType == DB_ACCESS {
+		switch x.DbType {
+		case DB_ACCESS:
 			sets = append(sets, fmt.Sprintf("%s=?", name))
-		} else {
+		case DB_MSSQL:
+			sets = append(sets, fmt.Sprintf("%s=@p%d", name, num))
+		default:
 			sets = append(sets, fmt.Sprintf("%s=$%d", name, num))
 		}
 		num += 1
