@@ -28,6 +28,17 @@ func Test_sql_quote(t *testing.T) {
 		Tst{DB_ACCESS, time.Date(1969, 11, 05, 23, 05, 03, 0, time.Local), "'1969-11-05 23:05:03'"},
 		Tst{DB_PG, time.Date(1969, 11, 05, 23, 05, 03, 0, time.Local), "'1969-11-05 23:05:03'"},
 		Tst{DB_MSSQL, time.Date(1969, 11, 05, 23, 05, 03, 0, time.Local), "'1969-11-05 23:05:03'"},
+		Tst{DB_PG, sql.NullBool{}, "null"},
+		Tst{DB_PG, sql.NullBool{true, true}, "true"},
+		Tst{DB_ACCESS, sql.NullBool{true, true}, "-1"},
+		Tst{DB_ACCESS, sql.NullBool{false, true}, "0"},
+		Tst{DB_ACCESS, sql.NullInt64{0, false}, "null"},
+		Tst{DB_ACCESS, sql.NullInt64{42, true}, "42"},
+		Tst{DB_ACCESS, sql.NullInt32{42, true}, "42"},
+		Tst{DB_ACCESS, sql.NullInt16{42, true}, "42"},
+		Tst{DB_PG, sql.NullInt64{42, true}, "42"},
+		Tst{DB_PG, sql.NullFloat64{42.42, true}, "42.42"},
+		Tst{DB_PG, sql.NullFloat64{42.42, false}, "null"},
 	}
 	for _, s := range tbl {
 		r := sql_quoter(s.T, s.V)

@@ -89,6 +89,47 @@ func sql_quoter(db_type int, s interface{}) string {
 				return "false"
 			}
 		}
+	case sql.NullBool:
+		if !v.Valid {
+			return "null"
+		}
+		switch db_type {
+		case DB_ACCESS:
+			switch v.Bool {
+			case true:
+				return "-1"
+			case false:
+				return "0"
+			}
+		default:
+			switch v.Bool {
+			case true:
+				return "true"
+			case false:
+				return "false"
+			}
+		}
+	case sql.NullInt64:
+		if !v.Valid {
+			return "null"
+		}
+		return strconv.Itoa(int(v.Int64))
+	case sql.NullInt32:
+		if !v.Valid {
+			return "null"
+		}
+		return strconv.Itoa(int(v.Int32))
+	case sql.NullInt16:
+		if !v.Valid {
+			return "null"
+		}
+		return strconv.Itoa(int(v.Int16))
+	case sql.NullFloat64:
+		if !v.Valid {
+			return "null"
+		}
+		return strconv.FormatFloat(v.Float64, 'f', -1, 64)
+
 	}
 	return fmt.Sprintf("%s", s)
 }
