@@ -1,4 +1,4 @@
-module go.flib.fr/sqlo
+module go.flibuste.net/sqlo
 
 go 1.12
 
