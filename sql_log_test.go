@@ -2,7 +2,6 @@ package sqlo
 
 import (
 	"database/sql"
-	"log"
 	"testing"
 	"time"
 
@@ -39,11 +38,12 @@ func Test_sql_quote(t *testing.T) {
 		Tst{DB_PG, sql.NullInt64{42, true}, "42"},
 		Tst{DB_PG, sql.NullFloat64{42.42, true}, "42.42"},
 		Tst{DB_PG, sql.NullFloat64{42.42, false}, "null"},
+		Tst{DB_PG, Raw("now()"), "now()"},
 	}
 	for _, s := range tbl {
 		r := sql_quoter(s.T, s.V)
 		if r != s.S {
-			log.Fatalf("attend %s reçoit %s", s.S, r)
+			t.Errorf("attend %s reçoit %s", s.S, r)
 		}
 	}
 }
@@ -67,11 +67,12 @@ func Test_sql_quote_query(t *testing.T) {
 			sql.NullTime{},
 			sql.NullTime{Valid: true, Time: time.Date(2019, 1, 2, 0, 0, 0, 0, time.Local)},
 		}, "null '2019-01-02 00:00:00' null '2019-01-02 00:00:00'"},
+		Tst{DB_PG, "$1 $3 $2 $3", []interface{}{5, Raw("now()"), "e'fg"}, "5 'e''fg' now() 'e''fg'"},
 	}
 	for _, s := range tbl {
 		r := sql_fake(s.T, s.Q, s.V...)
 		if r != s.S {
-			log.Fatalf("type %d : %s attend %s reçoit %s", s.T, s.Q, s.S, r)
+			t.Errorf("type %d : %s attend %s reçoit %s", s.T, s.Q, s.S, r)
 		}
 	}
 }

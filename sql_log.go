@@ -50,6 +50,8 @@ func sql_fake(db_type int, query string, args ...interface{}) string {
 
 func sql_quoter(db_type int, s interface{}) string {
 	switch v := s.(type) {
+	case Raw:
+		return string(v)
 	case nil:
 		return "null"
 	case int:

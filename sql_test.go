@@ -10,9 +10,11 @@ func Test_insertSt(t *testing.T) {
 	fs := map[string]interface{}{}
 	fs["ok"] = "coral"
 	fs["yes"] = "no"
-	q, _ := tx.insertSt("mytable", fs)
-	if q != "INSERT INTO mytable (ok, yes) VALUES ($1, $2)" {
-		log.Fatal(q)
+	fs["raw"] = Raw("now()")
+	q, args := tx.insertSt("mytable", fs)
+	if q != "INSERT INTO mytable (ok, raw, yes) VALUES ($1, now(), $2)" {
+		t.Error(q)
+		t.Error(args)
 	}
 }
 
@@ -21,9 +23,11 @@ func Test_updateSt(t *testing.T) {
 	fs := map[string]interface{}{}
 	fs["ok"] = "coral"
 	fs["yes"] = "no"
-	q, _ := tx.updateSt("mytable", fs, "ok=$1", "ok")
-	if q != "UPDATE mytable SET ok=$2, yes=$3 WHERE ok=$1" {
-		log.Fatal(q)
+	fs["raw"] = Raw("now()")
+	q, args := tx.updateSt("mytable", fs, "ok=$1", "ok")
+	if q != "UPDATE mytable SET ok=$2, raw=now(), yes=$3 WHERE ok=$1" {
+		t.Error(q)
+		t.Error(args)
 	}
 }
 

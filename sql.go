@@ -70,6 +70,8 @@ func (x *Sx) NamedExec(query string, arg interface{}) (sql.Result, error) {
 	return sqlx.NamedExec(x.Sx, query, arg)
 }
 
+type Raw string
+
 // renvoi la chaine sql et les valeurs pour un insert
 // à partir d'un map
 func (x *Sx) insertSt(table string, m map[string]interface{}) (string, []interface{}) {
@@ -81,7 +83,12 @@ func (x *Sx) insertSt(table string, m map[string]interface{}) (string, []interfa
 	}
 	sort.Strings(fieldnames)
 
-	for i, name := range fieldnames {
+	i := 0
+	for _, name := range fieldnames {
+		if v, ok := m[name].(Raw); ok {
+			fieldols = append(fieldols, string(v))
+			continue
+		}
 		switch x.DbType {
 		case DB_ACCESS:
 			fieldols = append(fieldols, "?")
@@ -90,6 +97,7 @@ func (x *Sx) insertSt(table string, m map[string]interface{}) (string, []interfa
 		default: //pg
 			fieldols = append(fieldols, fmt.Sprintf("$%d", i+1))
 		}
+		i++
 		values = append(values, m[name])
 	}
 	s := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
@@ -120,6 +128,10 @@ func (x *Sx) updateSt(table string, m map[string]interface{}, where string, wher
 	}
 	sort.Strings(fieldnames)
 	for _, name := range fieldnames {
+		if _, ok := m[name].(Raw); ok {
+			sets = append(sets, fmt.Sprintf("%s=%s", name, m[name]))
+			continue
+		}
 		switch x.DbType {
 		case DB_ACCESS:
 			sets = append(sets, fmt.Sprintf("%s=?", name))
