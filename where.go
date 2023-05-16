@@ -1,3 +1,5 @@
+// Copyright (c) 2023 William Dode
+
 package sqlo
 
 import (
@@ -11,9 +13,7 @@ type Where struct {
 	Args  []interface{}
 }
 
-//
 // remplace %s par ? ou $d
-//
 func (w *Where) Appendf(s string, a ...interface{}) {
 	if len(s) > 0 {
 		arg_nb := []interface{}{} // deviendra $1 $2 $...
@@ -35,11 +35,9 @@ func (w *Where) Appendf(s string, a ...interface{}) {
 	}
 }
 
-//
 // ajout sous forme de liste
 // exemple AppendListf("xyz in (%s)", "a","b","c")
 // doit ajouter "xyz in ($1,$2,$3)" avec args "a","b","c"
-//
 func (w *Where) AppendListf(s string, a ...interface{}) {
 	q := []string{} // les $1 $2...
 	for i := 0; i < len(a); i++ {
@@ -56,16 +54,12 @@ func (w *Where) AppendListf(s string, a ...interface{}) {
 	w.where = append(w.where, fmt.Sprintf(s, strings.Join(q, ",")))
 }
 
-//
 // renvoi suite avec and, sans le premier and
-//
 func (w *Where) And() string {
 	return strings.Join(w.where, " and ")
 }
 
-//
 // renvoi suite de and avec le premier and si non vide
-//
 func (w *Where) AndAnd() string {
 	if len(w.where) == 0 {
 		return ""
@@ -73,9 +67,7 @@ func (w *Where) AndAnd() string {
 	return " and " + w.And()
 }
 
-//
 // renvoi le where avec "where" sauf si vide
-//
 func (w *Where) Where() string {
 	if len(w.where) == 0 {
 		return ""
@@ -84,9 +76,7 @@ func (w *Where) Where() string {
 	return " where " + ands
 }
 
-//
 // renvoi une copie
-//
 func (w *Where) Clone() *Where {
 	wc := &Where{}
 	wc.Args = append(wc.Args, w.Args...)

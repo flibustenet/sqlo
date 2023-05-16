@@ -1,3 +1,5 @@
+// Copyright (c) 2023 William Dode
+
 package sqlo
 
 import (

@@ -1,3 +1,5 @@
+// Copyright (c) 2015 Serenize UG (haftungsbeschränkt)
+
 package sqlo
 
 import (
