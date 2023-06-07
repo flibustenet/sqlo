@@ -172,3 +172,13 @@ func (x *Sx) UpdateMap(table string, m map[string]interface{}, where string, whe
 
 	return res, err
 }
+
+// UpdateMapReturning will add returning at the end of the statement
+// with returning string and call Get to dest
+// dest must be a pointer to destination
+// returning is the name(s) of the field(s)
+func (x *Sx) UpdateMapReturning(dest any, returning string, table string, m map[string]interface{}, where string, where_vals ...any) error {
+	s, values := x.updateSt(table, m, where, where_vals...)
+	s += " returning " + returning
+	return x.Get(dest, s, values...)
+}
