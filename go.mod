@@ -1,6 +1,6 @@
 module go.flibuste.net/sqlo
 
-go 1.12
+go 1.18
 
 require (
 	github.com/jmoiron/sqlx v1.2.0

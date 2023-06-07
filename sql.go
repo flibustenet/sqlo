@@ -23,6 +23,7 @@ type Execer interface {
 	MustExec(string, ...interface{}) sql.Result
 	NamedExec(string, interface{}) (sql.Result, error)
 	InsertMap(string, map[string]interface{}) (sql.Result, error)
+	InsertMapReturning(any, string, string, map[string]interface{}) error
 	UpdateMap(string, map[string]interface{}, string, ...interface{}) (sql.Result, error)
 }
 
@@ -112,6 +113,16 @@ func (x *Sx) InsertMap(table string, m map[string]interface{}) (sql.Result, erro
 	s, values := x.insertSt(table, m)
 	res, err := x.Exec(s, values...)
 	return res, err
+}
+
+// InsertMapReturning will add returning at the end of the statement
+// with returning string and call Get to dest
+// dest must be a pointer to destination
+// returning is the name(s) of the field(s)
+func (x *Sx) InsertMapReturning(dest any, returning string, table string, m map[string]interface{}) error {
+	s, values := x.insertSt(table, m)
+	s += " returning " + returning
+	return x.Get(dest, s, values...)
 }
 
 // renvoi la chaine sql et les valeurs pour un update

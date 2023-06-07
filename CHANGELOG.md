@@ -1,0 +1,5 @@
+# Changelog
+
+## dev
+
+- Add InsertMapReturning
