@@ -1,4 +1,5 @@
 // Copyright (c) 2023 William Dode
+// Licensed under the MIT license. See LICENSE file in the project root for details.
 
 package sqlo
 
@@ -81,7 +82,7 @@ func (x *Sx) insertSt(table string, m map[string]interface{}) (string, []interfa
 	fieldols := make([]string, 0)
 	values := make([]interface{}, 0)
 	fieldnames := make([]string, 0)
-	for name, _ := range m {
+	for name := range m {
 		fieldnames = append(fieldnames, name)
 	}
 	sort.Strings(fieldnames)
@@ -136,7 +137,7 @@ func (x *Sx) updateSt(table string, m map[string]interface{}, where string, wher
 	}
 
 	fieldnames := make([]string, 0)
-	for name, _ := range m {
+	for name := range m {
 		fieldnames = append(fieldnames, name)
 	}
 	sort.Strings(fieldnames)

@@ -1,4 +1,5 @@
 // Copyright (c) 2023 William Dode
+// Licensed under the MIT license. See LICENSE file in the project root for details.
 
 package sqlo
 

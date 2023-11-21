@@ -1,4 +1,5 @@
 // Copyright (c) 2023 William Dode
+// Licensed under the MIT license. See LICENSE file in the project root for details.
 
 package sqlo
 
@@ -33,9 +34,9 @@ func sql_fake(db_type int, query string, args ...interface{}) string {
 			rqi++
 			return sql_quoter(db_type, args[rqi-1])
 		case DB_MSSQL:
-			rqi, _ = strconv.Atoi(s[2:len(s)])
+			rqi, _ = strconv.Atoi(s[2:])
 		default: // PG
-			rqi, _ = strconv.Atoi(s[1:len(s)])
+			rqi, _ = strconv.Atoi(s[1:])
 		}
 		return sql_quoter(db_type, args[rqi-1])
 	}

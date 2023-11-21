@@ -1,4 +1,5 @@
 // Copyright (c) 2015 Serenize UG (haftungsbeschränkt)
+// Licensed under the MIT license. See LICENSE file in the project root for details.
 
 package sqlo
 
