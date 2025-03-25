@@ -15,7 +15,7 @@ type Where struct {
 }
 
 // remplace %s par ? ou $d
-func (w *Where) Appendf(s string, a ...interface{}) {
+func (w *Where) And(s string, a ...interface{}) {
 	if len(s) > 0 {
 		arg_nb := []interface{}{} // deviendra $1 $2 $...
 		for i := 0; i < len(a); i++ {
@@ -39,7 +39,7 @@ func (w *Where) Appendf(s string, a ...interface{}) {
 // ajout sous forme de liste
 // exemple AppendListf("xyz in (%s)", "a","b","c")
 // doit ajouter "xyz in ($1,$2,$3)" avec args "a","b","c"
-func (w *Where) AppendListf(s string, a ...interface{}) {
+func (w *Where) AndList(s string, a ...interface{}) {
 	q := []string{} // les $1 $2...
 	for i := 0; i < len(a); i++ {
 		w.Args = append(w.Args, a[i])
@@ -55,25 +55,12 @@ func (w *Where) AppendListf(s string, a ...interface{}) {
 	w.where = append(w.where, fmt.Sprintf(s, strings.Join(q, ",")))
 }
 
-// renvoi suite avec and, sans le premier and
-func (w *Where) And() string {
-	return strings.Join(w.where, " and ")
-}
-
-// renvoi suite de and avec le premier and si non vide
-func (w *Where) AndAnd() string {
-	if len(w.where) == 0 {
-		return ""
-	}
-	return " and " + w.And()
-}
-
 // renvoi le where avec "where" sauf si vide
 func (w *Where) Where() string {
 	if len(w.where) == 0 {
 		return ""
 	}
-	ands := w.And()
+	ands := strings.Join(w.where, " and ")
 	return " where " + ands
 }
 

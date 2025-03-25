@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.0
+
+- conn db tx
+- Where with And
+
 ## 0.8.0
 
 - Add InsertMapReturning
