@@ -7,7 +7,4 @@ require (
 	github.com/lib/pq v1.10.9
 )
 
-require (
-	github.com/mattn/go-sqlite3 v1.14.16 // indirect
-	google.golang.org/appengine v1.6.2 // indirect
-)
+require github.com/mattn/go-sqlite3 v1.14.16 // indirect
